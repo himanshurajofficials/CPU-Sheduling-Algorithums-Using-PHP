@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab 2</title>
+</head>
+
+<body>
+    <style>
+        .hidden {
+            display: none;
+        }
+        
+        .button {
+            margin: 7px auto 7px 20px;
+        }
+        
+        .mb-30 {
+            margin-bottom: 30px;
+        }
+        
+        .color {
+            color: lightseagreen;
+            text-decoration: underline;
+        }
+    </style>
+    <select name="phase" id="phase">
+        <option value="1">Phase I: User in Loop</option>
+        <option value="2">Phase II: Semi-Automatic</option>
+        <option value="3">Phase III: Automatic</option>
+    </select><br><br>
+    <select name="scheduling" id="scheduling">
+        <option value="fcfs">First Come First Served Scheduling</option>
+        <option value="sjf">Shortest Job First Scheduling</option>
+        <option value="round_robin">Round Robin Scheduling</option>
+        <option value="priority">Priority Scheduling</option>
+    </select><br><br>
+    <input type="number" name="n_process" id="n_process" class="input" placeholder="Enter the number of processes">
+    <button type="button" class="button" id="generate-form">Generate form</button>
+    <form action="sample.php" method="post" class="hidden" id="fcfs">
+        <input type="hidden" name="scheduling_type" value="fcfs">
+        <input type="hidden" name="n_process">
+        <h3>Enter the process details:</h3>
+    </form>
+    <form action="sample.php" method="post" class="hidden" id="sjf">
+        <input type="hidden" name="n_process">
+        <input type="hidden" name="scheduling_type" value="sjf">
+        <h3>Enter the process details:</h3>
+    </form>
+    <form action="sample.php" method="post" class="hidden" id="round_robin">
+        <input type="hidden" name="scheduling_type" value="round_robin">
+        <input type="hidden" name="n_process">
+        <h3>Enter the process details:</h3>
+    </form>
+    <form action="sample.php" method="post" class="hidden" id="priority">
+        <input type="hidden" name="scheduling_type" value="priority">
+        <input type="hidden" name="n_process">
+        <h3>Enter the process details:</h3>
+    </form>
+    <script>
+        var schedulingType;
+        var form;
+        var forms;
+        var goButton = document.getElementById("generate-form")
+        var nElement = document.getElementById("n_process");
+        var phaseElement = document.getElementById("phase");
+        if (phaseElement.value === "3") {
+            if (!nElement.classList.contains("hidden")) {
+                nElement.classList.add("hidden");
+                goButton.innerText = "Go";
+            }
+        } else {
+            if (nElement.classList.contains("hidden")) {
+                nElement.classList.remove("hidden");
+                goButton.innerText = "Generate Form";
+            }
+        }
+        phaseElement.addEventListener("change", (event) => {
+            if (event.target.value === "3") {
+                if (!nElement.classList.contains("hidden")) {
+                    nElement.classList.add("hidden");
+                    goButton.innerText = "Go";
+                }
+            } else {
+                if (nElement.classList.contains("hidden")) {
+                    nElement.classList.remove("hidden");
+                    goButton.innerText = "Generate Form";
+                }
+            }
+        });
+        document.querySelectorAll(".button").forEach(button => {
+            button.addEventListener("click", (event) => {
+                var schedulingType = document.getElementById("scheduling").value;
+                var n = nElement.value;
+                form = document.getElementById(schedulingType);
+                forms = document.querySelectorAll("form");
+                event.preventDefault();
+                form.innerHTML = "<input type='hidden' name='scheduling_type' value='" + schedulingType + "'><input type='hidden' name='n_process' value='" + n + "'><h3 class='color'>Enter the process details:</h3>"
+                if (["fcfs", "sjf", "round_robin", "priority"].includes(schedulingType)) {
+                    for (var i = 0; i < n; i++) {
+                        var fieldset = document.createElement("fieldset");
+                        var legend = document.createElement("legend");
+                        legend.appendChild(document.createTextNode("Process " + (i + 1)));
+                        var nameElement = document.createElement("input");
+                        nameElement.setAttribute("type", "text");
+                        nameElement.setAttribute("name", "pname" + (i + 1));
+                        nameElement.classList.add("input");
+                        nameElement.setAttribute("placeholder", "Enter the process name");
+                        var idElement = document.createElement("input");
+                        idElement.setAttribute("type", "number");
+                        idElement.setAttribute("name", "pid" + (i + 1));
+                        idElement.classList.add("input");
+                        idElement.setAttribute("placeholder", "Enter the process id");
+                        var arrivalElement = document.createElement("input");
+                        arrivalElement.setAttribute("type", "number");
+                        arrivalElement.setAttribute("name", "arrival_time" + (i + 1));
+                        arrivalElement.classList.add("input");
+                        arrivalElement.setAttribute("placeholder", "Enter the process arrival time");
+                        var burstElement = document.createElement("input");
+                        burstElement.setAttribute("type", "number");
+                        burstElement.setAttribute("name", "burst_time" + (i + 1));
+                        burstElement.classList.add("input");
+                        burstElement.setAttribute("placeholder", "Enter the process burst time");
+                        fieldset.appendChild(legend);
+                        fieldset.appendChild(idElement);
+                        fieldset.appendChild(document.createElement("br"));
+                        fieldset.appendChild(nameElement);
+                        fieldset.appendChild(document.createElement("br"));
+                        fieldset.appendChild(arrivalElement);
+                        fieldset.appendChild(document.createElement("br"));
+                        fieldset.appendChild(burstElement);
+                        fieldset.appendChild(document.createElement("br"));
+                        if (schedulingType === "priority") {
+                            var priorityElement = document.createElement("input");
+                            priorityElement.setAttribute("type", "number");
+                            priorityElement.setAttribute("name", "priority" + (i + 1));
+                            priorityElement.classList.add("input");
+                            priorityElement.setAttribute("placeholder", "Enter the process priority");
+                            fieldset.appendChild(priorityElement);
+                        }
+                        form.appendChild(fieldset);
+                        form.appendChild(document.createElement("br"));
+                    }
+                    form.appendChild(document.createElement("br"));
+                    if (schedulingType === "round_robin") {
+                        var timeQuantumElement = document.createElement("input");
+                        timeQuantumElement.setAttribute("type", "number");
+                        timeQuantumElement.setAttribute("name", "time_quantum" + (i + 1));
+                        timeQuantumElement.classList.add("input");
+                        timeQuantumElement.setAttribute("placeholder", "Enter the time quantum");
+                        form.appendChild(timeQuantumElement);
+                        form.appendChild(document.createElement("br"));
+                    }
+                    var button = document.createElement("button");
+                    button.setAttribute("type", "submit");
+                    button.appendChild(document.createTextNode("Submit"));
+                    button.classList.add("mb-30");
+                    form.appendChild(button);
+                }
+                forms.forEach(formElement => {
+                    if (formElement.classList.contains("hidden")) {
+                        if (formElement === form)
+                            formElement.classList.remove("hidden");
+                    } else {
+                        formElement.classList.add("hidden");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
